@@ -1411,17 +1411,17 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><span class="tag tag-primary">„Do użytku służbowego BSB"</span></td>
+                                <td style="text-align: center;"><span class="tag tag-primary">„Do użytku służbowego BSB"</span></td>
                                 <td>Informacje poufne o wartości gospodarczej, których rozpowszechnianie nie leży w interesie Spółki, ale mogą być udostępniane kontrahentom w określonych przypadkach.</td>
                                 <td>Projekty rozwiązań prawnych, organizacyjnych, technicznych.</td>
                             </tr>
                             <tr>
-                                <td><span class="tag tag-secondary">„Do użytku wewnętrznego BSB"</span></td>
+                                <td style="text-align: center;"><span class="tag tag-secondary">„Do użytku wewnętrznego BSB"</span></td>
                                 <td>Informacje poufne dostępne tylko wewnątrz Spółki i jej kontrahentom z umową o poufności.</td>
                                 <td>Materiały z posiedzeń Zarządu, obsada personalna.</td>
                             </tr>
                             <tr>
-                                <td><span class="tag tag-accent">„Tajemnica BSB"</span></td>
+                                <td style="text-align: center;"><span class="tag tag-accent">„Tajemnica BSB"</span></td>
                                 <td>Informacje stanowiące tajemnicę handlową i know-how Spółki, chronione ze względu na konkurencyjność i innowacyjność.</td>
                                 <td>Kody źródłowe oprogramowania, plany zabezpieczenia systemów teleinformatycznych.</td>
                             </tr>
@@ -3384,20 +3384,17 @@ function createCertificateHTML(name, position, certNumber = generateCertificateN
                     <li>Postępowanie w sytuacjach awaryjnych i incydentach bezpieczeństwa</li>
                 </ul>
             </div>
-            
-            <div class="certificate-footer">
-
-                
-                <div class="certificate-date" style="text-align: center;">
-                    <span class="certificate-date-text">Data: ${dateStr}</span>
-                </div>
-                
-
-            </div>
-            
+<div class="certificate-footer">
+    <div class="certificate-date" style="text-align: center; width: 100%;">
+        <span class="certificate-date-text">Data: ${dateStr}</span>
+    </div>
+</div>
             <div class="certificate-number">
                 Numer certyfikatu: ${certNumber}
             </div>
+          <p style="text-align: center; font-size: 0.9rem; font-style: italic; color: var(--gray-600); margin-top: 10px;">
+                Certyfikat jest ważny rok i potwierdza znajomość zasad bezpieczeństwa informacji.
+            </p>
         </div>
     `;
 }
@@ -3555,9 +3552,9 @@ function generatePDFCertificate(name, position, certNumber = generateCertificate
                     canvas: [
                         {
                             type: 'line',
-                            x1: 277,  // Skrócona linia pod BSB
+                            x1: 237,  // Skrócona linia pod BSB
                             y1: 2,
-                            x2: 317,  // Skrócona linia pod BSB
+                            x2: 277,  // Skrócona linia pod BSB
                             y2: 2,
                             lineWidth: 1,
                             lineColor: colors.secondary
@@ -3579,9 +3576,9 @@ function generatePDFCertificate(name, position, certNumber = generateCertificate
                     canvas: [
                         {
                             type: 'line',
-                            x1: 235, 
+                            x1: 195, 
                             y1: 5,
-                            x2: 360,
+                            x2: 320,
                             y2: 5,
                             lineWidth: 3,
                             lineColor: colors.secondaryLight
@@ -3648,9 +3645,9 @@ function generatePDFCertificate(name, position, certNumber = generateCertificate
                             canvas: [
                                 {
                                     type: 'rect',
-                                    x: 70,
+                                    x: 40, 
                                     y: 0,
-                                    w: 455,  // Szersza ramka
+                                    w: 445,  // Szersza ramka
                                     h: 150,
                                     r: 8,
                                     color: '#EEF2FF',  // Bardzo jasny fiolet
@@ -3729,7 +3726,7 @@ function generatePDFCertificate(name, position, certNumber = generateCertificate
                 },
                 // Informacja o ważności - ostatni element certyfikatu
                 {
-                    text: 'Certyfikat jest ważny bezterminowo i potwierdza znajomość zasad bezpieczeństwa informacji.',
+                    text: 'Certyfikat jest ważny rok i potwierdza znajomość zasad bezpieczeństwa informacji.',
                     fontSize: 10,
                     italics: true,
                     color: colors.grayMedium,
