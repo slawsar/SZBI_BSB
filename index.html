@@ -3402,59 +3402,169 @@ function createCertificateHTML(name, position, certNumber = generateCertificateN
     `;
 }
 
-// Funkcja generująca PDF certyfikatu
 function generatePDFCertificate(name, position, certNumber = generateCertificateNumber()) {
     console.log("Rozpoczęcie generowania certyfikatu...");
     
     try {
-        // Sprawdź czy pdfMake jest dostępne
         if (typeof pdfMake === 'undefined') {
             console.error("Biblioteka pdfMake nie jest załadowana!");
-			alert("Biblioteka pdfMake nie jest dostępna. Sprawdź połączenie internetowe i odśwież stronę.");
+            alert("Biblioteka pdfMake nie jest dostępna. Sprawdź połączenie internetowe i odśwież stronę.");
             return;
         }
-        // Dodaj na początku skryptu lub w sekcji inicjalizacyjnej
-pdfMake.fonts = {
-    Roboto: {
-        normal: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/fonts/Roboto/Roboto-Regular.ttf',
-        bold: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/fonts/Roboto/Roboto-Medium.ttf',
-        italics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/fonts/Roboto/Roboto-Italic.ttf',
-        bolditalics: 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/fonts/Roboto/Roboto-MediumItalic.ttf'
-    }
-};
-        // Pobierz aktualną datę
+
+        // Definicja kolorów
+        const colors = {
+            primary: '#3730a3',      // Główny kolor (ciemny fiolet)
+            primaryLight: '#4f46e5', // Jaśniejszy fiolet
+            primaryDark: '#312e81',  // Ciemniejszy fiolet
+            secondary: '#0284c7',    // Niebieski
+            secondaryLight: '#0ea5e9', // Jaśniejszy niebieski
+            accent: '#f97316',       // Pomarańczowy
+            gold: '#fbbf24',         // Złoty
+            grayDark: '#1e293b',     // Ciemny szary
+            grayMedium: '#64748b',   // Średni szary
+            grayLight: '#e2e8f0',    // Jasny szary
+            white: '#ffffff',        // Biały
+            background: '#f8fafc'    // Tło
+        };
+
         const today = new Date();
         const dateStr = today.toLocaleDateString('pl-PL', {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric'
         });
-        
-        // Zdefiniuj kolory
-        const colors = {
-            primaryDark: '#312e81',
-            secondaryLight: '#0ea5e9',
-            grayDark: '#475569',
-            grayLight: '#94a3b8',
-            white: '#ffffff'
-        };
-        
-        // Definicja dokumentu PDF
+
         var docDefinition = {
             pageSize: 'A4',
             pageMargins: [40, 40, 40, 40],
-            
+            background: function() {
+                return [
+                    // Tło dokumentu
+                    {
+                        canvas: [
+                            {
+                                type: 'rect',
+                                x: 0,
+                                y: 0,
+                                w: 595.28,
+                                h: 841.89,
+                                color: colors.background
+                            }
+                        ]
+                    },
+                    // Ozdobna ramka zewnętrzna
+                    {
+                        canvas: [
+                            {
+                                type: 'rect',
+                                x: 20,
+                                y: 20,
+                                w: 555.28,
+                                h: 801.89,
+                                lineWidth: 2,
+                                lineColor: colors.primary,
+                                r: 8
+                            }
+                        ]
+                    },
+                    // Ozdobna ramka wewnętrzna
+                    {
+                        canvas: [
+                            {
+                                type: 'rect',
+                                x: 30,
+                                y: 30,
+                                w: 535.28,
+                                h: 781.89,
+                                lineWidth: 1,
+                                lineColor: colors.primaryLight,
+                                r: 4
+                            }
+                        ]
+                    },
+                    // Ozdobne narożniki
+                    {
+                        canvas: [
+                            {
+                                type: 'polyline',
+                                lineWidth: 3,
+                                closePath: false,
+                                lineColor: colors.primaryLight,
+                                points: [{x: 40, y: 40}, {x: 80, y: 40}, {x: 40, y: 80}]
+                            }
+                        ]
+                    },
+                    {
+                        canvas: [
+                            {
+                                type: 'polyline',
+                                lineWidth: 3,
+                                closePath: false,
+                                lineColor: colors.primaryLight,
+                                points: [{x: 555, y: 40}, {x: 515, y: 40}, {x: 555, y: 80}]
+                            }
+                        ]
+                    },
+                    {
+                        canvas: [
+                            {
+                                type: 'polyline',
+                                lineWidth: 3,
+                                closePath: false,
+                                lineColor: colors.primaryLight,
+                                points: [{x: 40, y: 800}, {x: 80, y: 800}, {x: 40, y: 760}]
+                            }
+                        ]
+                    },
+                    {
+                        canvas: [
+                            {
+                                type: 'polyline',
+                                lineWidth: 3,
+                                closePath: false,
+                                lineColor: colors.primaryLight,
+                                points: [{x: 555, y: 800}, {x: 515, y: 800}, {x: 555, y: 760}]
+                            }
+                        ]
+                    },
+                    // Subtelny znak wodny
+                    {
+                        text: 'BSB',
+                        color: colors.primaryLight,
+                        opacity: 0.03,
+                        fontSize: 180,
+                        bold: true,
+                        alignment: 'center',
+                        absolutePosition: { x: 150, y: 320 }
+                    }
+                ];
+            },
             content: [
-                // Logo BSB
+                // Logo BSB - poprawiona pozycja
                 {
                     text: 'BSB',
-                    color: colors.primaryDark,
+                    color: colors.primary,
                     fontSize: 24,
                     bold: true,
                     alignment: 'center',
-                    margin: [0, 20, 0, 20]
+                    margin: [0, 15, 0, 0]
                 },
-                
+                // Krótsza kreska pod BSB
+                {
+                    canvas: [
+                        {
+                            type: 'line',
+                            x1: 277,  // Skrócona linia pod BSB
+                            y1: 2,
+                            x2: 317,  // Skrócona linia pod BSB
+                            y2: 2,
+                            lineWidth: 1,
+                            lineColor: colors.secondary
+                        }
+                    ],
+                    margin: [0, 5, 0, 40]
+                },
                 // Tytuł certyfikatu
                 {
                     text: 'CERTYFIKAT',
@@ -3462,98 +3572,177 @@ pdfMake.fonts = {
                     fontSize: 36,
                     bold: true,
                     alignment: 'center',
-                    margin: [0, 20, 0, 5]
+                    margin: [0, 0, 0, 10]
                 },
-                
+                // Krótsza ozdobna linia pod tytułem
+                {
+                    canvas: [
+                        {
+                            type: 'line',
+                            x1: 235, 
+                            y1: 5,
+                            x2: 360,
+                            y2: 5,
+                            lineWidth: 3,
+                            lineColor: colors.secondaryLight
+                        }
+                    ],
+                    margin: [0, 0, 0, 30]
+                },
                 // Treść certyfikatu
                 {
                     text: 'Niniejszym zaświadcza się, że',
-                    fontSize: 16,
-                    color: colors.grayDark,
-                    alignment: 'center',
-                    margin: [0, 15, 0, 10]
-                },
-                
-                // Imię i nazwisko
-                {
-                    text: name,
-                    fontSize: 24,
-                    bold: true,
-                    color: colors.primaryDark,
-                    alignment: 'center',
-                    margin: [0, 0, 0, 5]
-                },
-                
-                // Stanowisko
-                {
-                    text: position,
-                    fontSize: 16,
-                    italics: true,
-                    color: colors.grayDark,
-                    alignment: 'center',
-                    margin: [0, 0, 0, 20]
-                },
-                
-                // Opis szkolenia
-                {
-                    text: 'ukończył(a) z wynikiem pozytywnym szkolenie:',
-                    fontSize: 16,
+                    fontSize: 14,
                     color: colors.grayDark,
                     alignment: 'center',
                     margin: [0, 0, 0, 10]
                 },
-                
+                // Imię i nazwisko
+                {
+                    text: name,
+                    fontSize: 26,
+                    bold: true,
+                    color: colors.primary,
+                    alignment: 'center',
+                    margin: [0, 0, 0, 5]
+                },
+                // Stanowisko
+                {
+                    text: position,
+                    fontSize: 18,
+                    italics: true,
+                    color: colors.grayMedium,
+                    alignment: 'center',
+                    margin: [0, 0, 0, 30]
+                },
+                // Opis szkolenia
+                {
+                    text: 'ukończył(a) z wynikiem pozytywnym szkolenie:',
+                    fontSize: 14,
+                    color: colors.grayDark,
+                    alignment: 'center',
+                    margin: [0, 0, 0, 10]
+                },
                 // Nazwa szkolenia
                 {
                     text: 'Bezpieczeństwo Informacji',
-                    fontSize: 20,
+                    fontSize: 24,
                     bold: true,
-                    color: colors.secondaryLight,
+                    color: colors.secondary,
                     alignment: 'center',
-                    margin: [0, 0, 0, 20]
+                    margin: [0, 0, 0, 30]
                 },
-                
                 // Opis zakresu
                 {
                     text: 'Zakres szkolenia obejmował następujące zagadnienia:',
                     fontSize: 14,
                     color: colors.grayDark,
                     alignment: 'center',
+                    margin: [0, 0, 0, 15]
+                },
+                // Lista tematów szkolenia w szerszej ramce, krótsze teksty
+                {
+                    stack: [
+                        // Tło dla listy
+                        {
+                            canvas: [
+                                {
+                                    type: 'rect',
+                                    x: 70,
+                                    y: 0,
+                                    w: 455,  // Szersza ramka
+                                    h: 150,
+                                    r: 8,
+                                    color: '#EEF2FF',  // Bardzo jasny fiolet
+                                    lineColor: colors.primaryLight,
+                                    lineWidth: 1
+                                }
+                            ]
+                        },
+                        // Punkty listy nałożone na tło
+                        {
+                            margin: [100, -140, 30, 20],  // Większy lewy margines, mniejszy prawy
+                            ul: [
+                                {
+                                    text: 'Podstawy bezpieczeństwa informacji i Polityki Spółki',
+                                    lineHeight: 1.8,
+                                    margin: [0, 0, 0, 5]
+                                },
+                                {
+                                    text: 'Klasyfikacja informacji i zasady postępowania',
+                                    lineHeight: 1.8,
+                                    margin: [0, 0, 0, 5]
+                                },
+                                {
+                                    text: 'Bezpieczeństwo w pracy zdalnej i urządzeń mobilnych',
+                                    lineHeight: 1.8,
+                                    margin: [0, 0, 0, 5]
+                                },
+                                {
+                                    text: 'Ochrona haseł i dostępu do systemów',
+                                    lineHeight: 1.8,
+                                    margin: [0, 0, 0, 5]
+                                },
+                                {
+                                    text: 'Postępowanie w sytuacjach awaryjnych i incydentach bezpieczeństwa',
+                                    lineHeight: 1.8
+                                }
+                            ],
+                            fontSize: 11,  // Mniejsza czcionka
+                            color: colors.grayDark
+                        }
+                    ],
+                    margin: [0, 0, 0, 50]
+                },
+                // Data
+                {
+                    columns: [
+                        {
+                            width: '*',
+                            text: ''
+                        },
+                        {
+                            width: 'auto',
+                            stack: [
+                                {
+                                    text: 'Data: ' + dateStr,
+                                    fontSize: 12,
+                                    bold: true,
+                                    alignment: 'center',
+                                }
+                            ]
+                        },
+                        {
+                            width: '*',
+                            text: ''
+                        }
+                    ],
                     margin: [0, 0, 0, 10]
                 },
-                
-                // Lista tematów szkolenia
-                {
-                    ul: [
-                        'Podstawy bezpieczeństwa informacji i Polityki Spółki',
-                        'Klasyfikacja informacji i zasady postępowania',
-                        'Bezpieczeństwo w pracy zdalnej i urządzeń mobilnych',
-                        'Ochrona haseł i dostępu do systemów',
-                        'Postępowanie w sytuacjach awaryjnych i incydentach bezpieczeństwa'
-                    ],
-                    fontSize: 12,
-                    color: colors.grayDark,
-                    margin: [80, 0, 0, 30]
-                },
-                
-
                 // Numer certyfikatu
                 {
                     text: 'Numer certyfikatu: ' + certNumber,
-                    fontSize: 8,
-                    color: colors.grayLight,
+                    fontSize: 10,
+                    color: colors.grayMedium,
                     alignment: 'center',
-                    margin: [0, 40, 0, 0]
+                    margin: [0, 0, 0, 50]
+                },
+                // Informacja o ważności - ostatni element certyfikatu
+                {
+                    text: 'Certyfikat jest ważny bezterminowo i potwierdza znajomość zasad bezpieczeństwa informacji.',
+                    fontSize: 10,
+                    italics: true,
+                    color: colors.grayMedium,
+                    alignment: 'center',
+                    margin: [0, 0, 0, 0]
                 }
+                // Usunięto logo BSB z dołu dokumentu
             ],
-            // Używamy domyślnej czcionki 'Roboto' zamiast 'Helvetica'
             defaultStyle: {
                 font: 'Roboto'
             }
         };
 
-        console.log("Generowanie PDF...");
-        
         // Utwórz i pobierz PDF
         pdfMake.createPdf(docDefinition).download('Certyfikat_' + name.replace(/\s+/g, '_') + '.pdf');
         
@@ -3564,7 +3753,6 @@ pdfMake.fonts = {
         alert("Wystąpił błąd podczas generowania certyfikatu: " + error.message);
     }
 }
-
 // Uruchom po załadowaniu dokumentu
 document.addEventListener('DOMContentLoaded', function() {
     console.log("Inicjalizacja obsługi certyfikatu...");
