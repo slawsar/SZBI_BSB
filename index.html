@@ -1184,6 +1184,70 @@
     margin-top: 1rem;
     border-radius: var(--radius-full);
 }
+/* Nowe style dla śledzenia postępu */
+.quiz-completed-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: rgba(16, 185, 129, 0.1);
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    animation: fadeIn 0.5s ease;
+}
+
+.section-completed {
+    border-left: 4px solid var(--success);
+}
+
+.completion-icon {
+    display: inline-block;
+    margin-left: 10px;
+    animation: fadeIn 0.5s ease;
+}
+
+/* Wzmocnij animację pasków postępu */
+.progress-bar {
+    transition: width 0.5s ease;
+}
+       /* Style dla znaczników zaliczenia quizu */
+        .completion-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 8px;
+            color: var(--success);
+            background-color: rgba(16, 185, 129, 0.2);
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            font-weight: bold;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        /* Efekt pulsowania dla nowo dodanych znaczników */
+        @keyframes pulse-badge {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .completion-badge.new {
+            animation: pulse-badge 0.5s ease 3;
+        }
+        
+        /* Modyfikacja stylu przycisków nawigacji, aby lepiej pomieścić znaczniki */
+        nav button {
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        /* Style dla krokodyla wyświetlanego w konsoli */
+        .console-crocodile {
+            color: green;
+            font-size: 20px;
+        }
     </style>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
@@ -1206,13 +1270,34 @@
     </button>
     
     <nav id="main-nav">
-        <button data-section="section-intro" class="active">Wprowadzenie</button>
-        <button data-section="section-basics">Podstawy Bezpieczeństwa</button>
-        <button data-section="section-classification">Klasyfikacja Informacji</button>
-        <button data-section="section-remote">Praca Zdalna</button>
-        <button data-section="section-passwords">Ochrona Haseł</button>
-        <button data-section="section-incidents">Incydenty Bezpieczeństwa</button>
-        <button data-section="section-summary">Podsumowanie</button>
+        <button data-section="section-intro" class="active">
+            Wprowadzenie
+            <span class="completion-badge" id="intro-badge" style="display: none;">✓</span>
+        </button>
+        <button data-section="section-basics">
+            Podstawy Bezpieczeństwa
+            <span class="completion-badge" id="basics-badge" style="display: none;">✓</span>
+        </button>
+        <button data-section="section-classification">
+            Klasyfikacja Informacji
+            <span class="completion-badge" id="classification-badge" style="display: none;">✓</span>
+        </button>
+        <button data-section="section-remote">
+            Praca Zdalna
+            <span class="completion-badge" id="remote-badge" style="display: none;">✓</span>
+        </button>
+        <button data-section="section-passwords">
+            Ochrona Haseł
+            <span class="completion-badge" id="passwords-badge" style="display: none;">✓</span>
+        </button>
+        <button data-section="section-incidents">
+            Incydenty Bezpieczeństwa
+            <span class="completion-badge" id="incidents-badge" style="display: none;">✓</span>
+        </button>
+        <button data-section="section-summary">
+            Podsumowanie
+            <span class="completion-badge" id="summary-badge" style="display: none;">✓</span>
+        </button>
     </nav>
     
     <main>
@@ -2600,30 +2685,6 @@
     </div>
 </div>
 
-<!-- Poprawiony modal z formularzem certyfikatu -->
-<div class="modal" id="certificate-modal">
-    <div class="modal-content animate-scaleIn" style="max-width: 500px;">
-        <button class="modal-close" onclick="closeModal('certificate-modal')">✕</button>
-        <h2>Generowanie certyfikatu</h2>
-        <p>Aby wygenerować certyfikat, wprowadź swoje dane poniżej:</p>
-        
-        <form id="certificate-form" style="margin-top: 1.5rem;">
-            <div style="margin-bottom: 1rem;">
-                <label for="cert-name" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Imię i nazwisko:</label>
-                <input type="text" id="cert-name" required style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: var(--radius); font-size: 1rem;">
-            </div>
-            
-            <div style="margin-bottom: 1.5rem;">
-                <label for="cert-position" style="display: block; margin-bottom: 0.5rem; font-weight: 500;">Stanowisko:</label>
-                <input type="text" id="cert-position" required style="width: 100%; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: var(--radius); font-size: 1rem;">
-            </div>
-            
-            <button type="submit" style="width: 100%; padding: 0.75rem 1.5rem; border: none; border-radius: var(--radius-full); background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; font-weight: 600; cursor: pointer; transition: all 0.3s ease; box-shadow: var(--shadow);">
-                Generuj certyfikat
-            </button>
-        </form>
-    </div>
-</div>
 
 <!-- Poprawiony modal dla podglądu certyfikatu -->
 <div class="modal" id="certificate-preview-modal">
@@ -2658,6 +2719,17 @@ let quizProgress = {
 const totalQuizzes = Object.keys(quizProgress).length;
 let commitmentsConfirmed = false;
 
+// Śledzenie liczby prób rozwiązania quizów
+let quizAttempts = {
+    'intro-quiz': 0,
+    'basics-quiz': 0,
+    'classification-quiz': 0,
+    'remote-quiz': 0,
+    'password-quiz': 0,
+    'incidents-quiz': 0,
+    'final-quiz': 0
+};
+
 // Funkcje globalne
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
@@ -2683,12 +2755,10 @@ function closeModal(modalId) {
 
 // Funkcje nawigacji
 document.addEventListener('DOMContentLoaded', function() {
-    // Usuwamy deklarację quizProgress, ponieważ jest już zdefiniowana globalnie
     updateProgress(0);
     
     // Obsługa nawigacji
     const navButtons = document.querySelectorAll('#main-nav button');
-    // Reszta kodu pozostaje bez zmian...
             navButtons.forEach((button, index) => {
                 button.addEventListener('click', function() {
                     const sectionId = this.getAttribute('data-section');
@@ -2709,8 +2779,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Aktualizuj pasek postępu
                     updateProgress(index);
+
                 });
             });
+							loadProgress();
             
             // Obsługa kart otwierających modalne okna
             const cards = document.querySelectorAll('.card[data-modal]');
@@ -2779,8 +2851,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Obsługa przycisków i formularza
 document.addEventListener('DOMContentLoaded', function() {
-// Wykonaj początkową aktualizację pasków postępu
-updateAllProgressBars();
+    // Wykonaj początkową aktualizację pasków postępu
+    updateAllProgressBars();
+    
     // Obsługa przycisku generowania certyfikatu
     const generateCertBtn = document.getElementById('generate-certificate-btn');
     if (generateCertBtn) {
@@ -2830,6 +2903,9 @@ updateAllProgressBars();
                     nav.classList.remove('scrolled');
                 }
             });
+			            updateNavigationBadges();
+            
+            console.log('Inicjalizacja zakończona, znaczniki zaliczenia gotowe');
         });
         
 // Funkcja aktualizująca pasek postępu
@@ -2901,25 +2977,82 @@ function updateOverallProgress() {
         
 // Funkcja aktualizująca wszystkie paski postępu na podstawie ukończonych quizów
 function updateAllProgressBars() {
+    // Sprawdź czy quizProgress zostało poprawnie zainicjalizowane
+    if (!quizProgress || typeof quizProgress !== 'object') {
+        console.error('quizProgress nie zostało poprawnie zainicjalizowane');
+        return;
+    }
     // Oblicz procent ukończenia na podstawie zaliczonych quizów
     const completedQuizzes = Object.values(quizProgress).filter(status => status).length;
     const totalQuizzes = Object.keys(quizProgress).length;
+    
+    // Dodaj walidację dla zerowego dzielnika
+    if (totalQuizzes === 0) return;
+    
+    // Oblicz procentowy postęp
     const progressPercentage = Math.round((completedQuizzes / totalQuizzes) * 100);
     
-    // Pobierz wszystkie paski postępu i etykiety procentowe
+    console.log(`Aktualizacja pasków postępu: ${completedQuizzes}/${totalQuizzes} quizów (${progressPercentage}%)`);
+    
+    // Znajdź wszystkie paski postępu i etykiety na stronie
     const progressBars = document.querySelectorAll('.progress-bar');
     const progressLabels = document.querySelectorAll('.progress-label span:last-child');
     
-    // Zaktualizuj wszystkie paski postępu i etykiety z tym samym procentem
+    if (progressBars.length === 0) {
+        console.warn('Nie znaleziono pasków postępu na stronie');
+        return;
+    }
+    
+    // Zaktualizuj wszystkie paski postępu i etykiety
     progressBars.forEach(bar => {
         bar.style.width = `${progressPercentage}%`;
+        // Dodaj animację dla lepszego efektu wizualnego
+        bar.style.transition = 'width 0.5s ease';
     });
     
     progressLabels.forEach(label => {
         label.textContent = `${progressPercentage}%`;
     });
-        updateCompletionStatus();
+    
+    // Zaktualizuj dodatkowe wskaźniki postępu, jeśli istnieją
+    updateSectionProgress();
+    
+    // Zaktualizuj stan ukończenia szkolenia
+    updateCompletionStatus();
+    
+    // Zapisz zaktualizowany postęp
+    saveProgress();
+}
 
+function updateSectionProgress() {
+    // Mapowanie sekcji do odpowiadających im quizów
+    const sections = [
+        { id: 'section-intro', quizId: 'intro-quiz' },
+        { id: 'section-basics', quizId: 'basics-quiz' },
+        { id: 'section-classification', quizId: 'classification-quiz' },
+        { id: 'section-remote', quizId: 'remote-quiz' },
+        { id: 'section-passwords', quizId: 'password-quiz' },
+        { id: 'section-incidents', quizId: 'incidents-quiz' },
+        { id: 'section-summary', quizId: 'final-quiz' }
+    ];
+    
+    sections.forEach(section => {
+        const sectionElement = document.getElementById(section.id);
+        if (sectionElement) {
+            const completed = quizProgress[section.quizId];
+            
+            // Usuń klasę section-completed jeśli istnieje
+            if (sectionElement.classList.contains('section-completed')) {
+                sectionElement.classList.remove('section-completed');
+            }
+            
+            // Usuń ikony completion-icon, jeśli istnieją
+            const completionIcons = sectionElement.querySelectorAll('.completion-icon');
+            completionIcons.forEach(icon => {
+                icon.remove();
+            });
+        }
+    });
 }
 // Funkcja sprawdzająca czy wszystkie warunki ukończenia kursu zostały spełnione
 function updateCompletionStatus() {
@@ -2943,13 +3076,138 @@ function updateCompletionStatus() {
         console.log('- BŁĄD: Nie znaleziono sekcji gratulacji!');
     }
 }
+// Funkcja zapisująca postęp do localStorage
+function saveProgress() {
+    const progressData = {
+        quizProgress: quizProgress,
+        commitmentsConfirmed: commitmentsConfirmed,
+        quizAttempts: quizAttempts,
+        lastUpdated: new Date().toISOString()
+    };
+    
+    localStorage.setItem('bsb-security-training-progress', JSON.stringify(progressData));
+    console.log('Postęp zapisany:', progressData);
+}
+
+// Funkcja ładująca postęp z localStorage
+// Poprawka funkcji loadProgress
+function loadProgress() {
+    const savedData = localStorage.getItem('bsb-security-training-progress');
+    
+    if (savedData) {
+        try {
+            const progressData = JSON.parse(savedData);
+            console.log('Znaleziono zapisany postęp:', progressData);
+            
+            // Aktualizacja stanu aplikacji
+            if (progressData.quizProgress) {
+                quizProgress = progressData.quizProgress;
+            }
+            
+            commitmentsConfirmed = progressData.commitmentsConfirmed || false;
+            
+            if (progressData.quizAttempts) {
+                quizAttempts = progressData.quizAttempts;
+            }
+            
+            // Odłóż aktualizację UI do momentu, gdy DOM jest już gotowy
+            setTimeout(() => {
+                updateAllProgressBars();
+                updateCompletionStatus();
+                markCompletedQuizzes();
+                updateNavigationBadges();
+                console.log('Interfejs zaktualizowany na podstawie zapisanego postępu');
+            }, 300);
+        } catch (error) {
+            console.error('Błąd podczas ładowania postępu:', error);
+        }
+    } else {
+        console.log('Nie znaleziono zapisanego postępu');
+    }
+}
+
+// Wzmocnione zapisywanie postępu
+function saveProgress() {
+    const progressData = {
+        quizProgress: quizProgress,
+        commitmentsConfirmed: commitmentsConfirmed,
+        quizAttempts: quizAttempts,
+        lastUpdated: new Date().toISOString()
+    };
+    
+    try {
+        localStorage.setItem('bsb-security-training-progress', JSON.stringify(progressData));
+        console.log('Postęp zapisany pomyślnie:', progressData);
+    } catch (error) {
+        console.error('Błąd podczas zapisywania postępu:', error);
+    }
+}
+
+// Funkcja testująca dostęp do localStorage
+function testLocalStorage() {
+    try {
+        localStorage.setItem('test', 'test');
+        localStorage.removeItem('test');
+        return true;
+    } catch (e) {
+        console.error('localStorage niedostępny:', e);
+        return false;
+    }
+}
+
+// Sprawdź localStorage po załadowaniu strony
+window.addEventListener('load', function() {
+    if (testLocalStorage()) {
+        console.log('localStorage jest dostępny, wczytywanie postępu...');
+        loadProgress();
+    } else {
+        console.warn('localStorage niedostępny - zapisywanie postępu nie będzie działać');
+    }
+});
+
+// Funkcja oznaczająca zaliczone quizy w UI
+        function markCompletedQuizzes() {
+            console.log('Oznaczanie ukończonych quizów');
+            
+            for (const [quizId, completed] of Object.entries(quizProgress)) {
+                if (completed) {
+                    const quizForm = document.querySelector(`.quiz-form[data-quiz="${quizId}"]`);
+                    if (quizForm) {
+                        // Sprawdź, czy badge już istnieje
+                        if (!quizForm.parentNode.querySelector('.quiz-completed-badge')) {
+                            // Dodaj oznaczenie zaliczonego quizu
+                            const completionBadge = document.createElement('div');
+                            completionBadge.className = 'quiz-completed-badge';
+                            completionBadge.innerHTML = '✓ Zaliczony';
+                            completionBadge.style.color = 'var(--success)';
+                            completionBadge.style.fontWeight = 'bold';
+                            completionBadge.style.marginBottom = '10px';
+                            
+                            // Wstaw oznaczenie przed formularzem quizu
+                            quizForm.parentNode.insertBefore(completionBadge, quizForm);
+                            console.log(`Dodano znacznik zaliczenia dla quizu ${quizId}`);
+                        }
+                    } else {
+                        console.warn(`Nie znaleziono formularza dla quizu ${quizId}`);
+                    }
+                }
+            }
+            
+            // Wywołaj funkcję aktualizującą znaczniki nawigacji
+            updateNavigationBadges();
+        }
 // Modyfikacja funkcji sprawdzającej odpowiedzi w quizie
 function checkAnswers(quizId, form) {
-    let isCorrect = false;
-    let feedbackMessage = '';
-    
-    const feedback = form.querySelector('.quiz-feedback');
+            // Zwiększ licznik prób dla tego quizu
+            quizAttempts[quizId] = (quizAttempts[quizId] || 0) + 1;
+            console.log(`Próba ${quizAttempts[quizId]} dla quizu: ${quizId}`);
             
+            let isCorrect = false;
+            let feedbackMessage = '';
+            
+            const feedback = form.querySelector('.quiz-feedback');
+            
+            // Pozostaw istniejącą logikę sprawdzania odpowiedzi dla różnych quizów:
             switch(quizId) {
                 case 'intro-quiz':
                     const intro_answer = form.querySelector('input[name="intro-q1"]:checked')?.value;
@@ -2958,7 +3216,7 @@ function checkAnswers(quizId, form) {
                         'Poprawna odpowiedź! Bezpieczeństwo informacji jest odpowiedzialnością wszystkich pracowników Spółki.' : 
                         'Niestety, to nie jest poprawna odpowiedź. Bezpieczeństwo informacji jest odpowiedzialnością wszystkich pracowników Spółki, nie tylko wybranych osób lub działów.';
                     break;
-                    
+                            
                 case 'basics-quiz':
                     const basics_answer1 = form.querySelector('input[name="basics-q1"]:checked')?.value;
                     const basics_answer2 = form.querySelector('input[name="basics-q2"]:checked')?.value;
@@ -2967,7 +3225,7 @@ function checkAnswers(quizId, form) {
                         'Świetnie! Poprawne odpowiedzi. Polityka Bezpieczeństwa Informacji jest najwyższym rangą dokumentem Spółki w zakresie bezpieczeństwa, a poufność oznacza ochronę przed nieuprawnionym ujawnieniem.' : 
                         'Niestety, nie wszystkie odpowiedzi są poprawne. Polityka Bezpieczeństwa Informacji jest najwyższym rangą dokumentem Spółki w zakresie bezpieczeństwa, a poufność oznacza ochronę przed nieuprawnionym ujawnieniem.';
                     break;
-                    
+                            
                 case 'classification-quiz':
                     const classification_answer = form.querySelector('input[name="classification-q1"]:checked')?.value;
                     isCorrect = classification_answer === 'd';
@@ -2975,7 +3233,7 @@ function checkAnswers(quizId, form) {
                         'Poprawna odpowiedź! Dokument z klauzulą „Tajemnica BSB" powinien być przechowywany w sejfie lub innym bezpiecznym miejscu po zakończeniu pracy.' : 
                         'Niestety, to nie jest poprawna odpowiedź. Dokument z klauzulą „Tajemnica BSB" powinien być przechowywany w sejfie lub innym bezpiecznym miejscu po zakończeniu pracy.';
                     break;
-                    
+                            
                 case 'remote-quiz':
                     const remote_answer = form.querySelector('input[name="remote-q1"]:checked')?.value;
                     isCorrect = remote_answer === 'c';
@@ -2983,7 +3241,7 @@ function checkAnswers(quizId, form) {
                         'Poprawna odpowiedź! W przypadku zgubienia służbowego laptopa, należy niezwłocznie zgłosić ten fakt przełożonemu i do odpowiednich działów.' : 
                         'Niestety, to nie jest poprawna odpowiedź. W przypadku zgubienia służbowego laptopa, należy niezwłocznie zgłosić ten fakt przełożonemu i do odpowiednich działów.';
                     break;
-                    
+                            
                 case 'password-quiz':
                     const password_answer = form.querySelector('input[name="password-q1"]:checked')?.value;
                     isCorrect = password_answer === 'b';
@@ -2991,7 +3249,7 @@ function checkAnswers(quizId, form) {
                         'Poprawna odpowiedź! Hasło "Silne#Haslo2023" spełnia wymagania polityki haseł Spółki - ma ponad 8 znaków, zawiera małe i duże litery, cyfry oraz znaki specjalne.' : 
                         'Niestety, to nie jest poprawna odpowiedź. Hasło "Silne#Haslo2023" spełnia wymagania polityki haseł Spółki - ma ponad 8 znaków, zawiera małe i duże litery, cyfry oraz znaki specjalne.';
                     break;
-                    
+                            
                 case 'incidents-quiz':
                     const incidents_answer = form.querySelector('input[name="incidents-q1"]:checked')?.value;
                     isCorrect = incidents_answer === 'b';
@@ -2999,31 +3257,61 @@ function checkAnswers(quizId, form) {
                         'Poprawna odpowiedź! W przypadku podejrzenia incydentu bezpieczeństwa, należy niezwłocznie poinformować swojego przełożonego.' : 
                         'Niestety, to nie jest poprawna odpowiedź. W przypadku podejrzenia incydentu bezpieczeństwa, należy niezwłocznie poinformować swojego przełożonego.';
                     break;
+                            
+                case 'final-quiz':
+                    const final_answer1 = form.querySelector('input[name="final-q1"]:checked')?.value;
+                    const final_answer2 = form.querySelector('input[name="final-q2"]:checked')?.value;
+                    const final_answer3 = form.querySelector('input[name="final-q3"]:checked')?.value;
+                    isCorrect = final_answer1 === 'd' && final_answer2 === 'b' && final_answer3 === 'c';
                     
-case 'final-quiz':
-    const final_answer1 = form.querySelector('input[name="final-q1"]:checked')?.value;
-    const final_answer2 = form.querySelector('input[name="final-q2"]:checked')?.value;
-    const final_answer3 = form.querySelector('input[name="final-q3"]:checked')?.value;
-    isCorrect = final_answer1 === 'd' && final_answer2 === 'b' && final_answer3 === 'c';
-    
-    if (isCorrect) {
-        feedbackMessage = 'Gratulacje! Wszystkie odpowiedzi są poprawne. Świetnie opanowałeś/aś zasady bezpieczeństwa informacji w Spółce!';
-    } else {
-        feedbackMessage = 'Niestety, nie wszystkie odpowiedzi są poprawne. Poprawne odpowiedzi to: <br>1. Zasada "czystego biurka" to zabezpieczanie dokumentów i nośników danych po zakończeniu pracy. <br>2. Minimalna długość hasła to 8 znaków. <br>3. Za zgłoszenie zagubienia laptopa odpowiedzialny jest pracownik, któremu laptop został powierzony.';
-    }
+                    if (isCorrect) {
+                        feedbackMessage = 'Gratulacje! Wszystkie odpowiedzi są poprawne. Świetnie opanowałeś/aś zasady bezpieczeństwa informacji w Spółce!';
+                    } else {
+                        feedbackMessage = 'Niestety, nie wszystkie odpowiedzi są poprawne. Poprawne odpowiedzi to: <br>1. Zasada "czystego biurka" to zabezpieczanie dokumentów i nośników danych po zakończeniu pracy. <br>2. Minimalna długość hasła to 8 znaków. <br>3. Za zgłoszenie zagubienia laptopa odpowiedzialny jest pracownik, któremu laptop został powierzony.';
+                    }
                     break;
+            }
+            
+            // Dodaj informację o liczbie prób do komunikatu zwrotnego
+            if (!isCorrect && quizAttempts[quizId] > 1) {
+                feedbackMessage += `<p style="margin-top: 10px; font-style: italic;">To była Twoja ${quizAttempts[quizId]} próba rozwiązania tego quizu.</p>`;
+            }
+            
+            // Jeśli quiz został już wcześniej zaliczony, dodaj tę informację
+            if (quizProgress[quizId] && !isCorrect) {
+                feedbackMessage += '<p style="margin-top: 10px; color: var(--warning);">Ten quiz został już zaliczony wcześniej.</p>';
             }
             
             feedback.innerHTML = feedbackMessage;
             feedback.classList.remove('success', 'error');
             feedback.classList.add(isCorrect ? 'success' : 'error');
             feedback.style.display = 'block';
-			    // Aktualizacja statusu quizu (dodać to na końcu funkcji checkAnswers)
-    if (isCorrect) {
-        quizProgress[quizId] = true;
-        // Aktualizuj wszystkie paski postępu
-        updateAllProgressBars();
-    }
+            
+            // Aktualizacja statusu quizu i zapis postępu
+            if (isCorrect) {
+                // Oznacz quiz jako zaliczony
+                quizProgress[quizId] = true;
+                
+                // Dodaj oznaczenie zaliczonego quizu
+                if (!form.parentNode.querySelector('.quiz-completed-badge')) {
+                    const completionBadge = document.createElement('div');
+                    completionBadge.className = 'quiz-completed-badge';
+                    completionBadge.innerHTML = '✓ Zaliczony';
+                    completionBadge.style.color = 'var(--success)';
+                    completionBadge.style.fontWeight = 'bold';
+                    completionBadge.style.marginBottom = '10px';
+                    form.parentNode.insertBefore(completionBadge, form);
+                }
+                
+                // Aktualizuj paski postępu
+                updateAllProgressBars();
+                
+                // Aktualizuj znaczniki nawigacji
+                updateNavigationBadges();
+            }
+            
+            // Zapisz postęp po każdej próbie
+            saveProgress();
         }
         
         // Funkcja wyświetlająca informacje o pracy zdalnej
@@ -3732,7 +4020,6 @@ function generatePDFCertificate(name, position, certNumber = generateCertificate
 
         // Utwórz i pobierz PDF
         pdfMake.createPdf(docDefinition).download('Certyfikat_' + name.replace(/\s+/g, '_') + '.pdf');
-        
         console.log("Wygenerowano PDF");
         
     } catch (error) {
@@ -3821,15 +4108,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     console.log("Inicjalizacja obsługi certyfikatu zakończona");
-});
-
-// Dodajemy funkcje do globalnego obiektu window dla zapewnienia dostępności
-window.createCertificateHTML = createCertificateHTML;
-window.generatePDFCertificate = generatePDFCertificate;
-window.generateCertificateNumber = generateCertificateNumber;
-
-// Obsługa przycisku potwierdzenia zobowiązań
-document.addEventListener('DOMContentLoaded', function() {
+	// Obsługa przycisku potwierdzenia zobowiązań
     const confirmBtn = document.getElementById('confirm-commitments');
     if (confirmBtn) {
         confirmBtn.addEventListener('click', function() {
@@ -3881,7 +4160,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 feedbackDiv.style.display = 'block';
                 
-                // WAŻNA ZMIANA: Aktualizacja statusu ukończenia po zmianie flagi
+                // DODAJ PONIŻSZĄ LINIĘ: Zapis postępu i aktualizacja statusu ukończenia
+                saveProgress();
                 updateCompletionStatus();
             }
         });
@@ -3889,6 +4169,52 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error("Nie znaleziono przycisku potwierdzania zobowiązań!");
     }
 });
+
+// Dodajemy funkcje do globalnego obiektu window dla zapewnienia dostępności
+window.createCertificateHTML = createCertificateHTML;
+window.generatePDFCertificate = generatePDFCertificate;
+window.generateCertificateNumber = generateCertificateNumber;
+
+ // Funkcja aktualizująca znaczniki zaliczenia w nawigacji
+        function updateNavigationBadges() {
+            // Mapowanie identyfikatorów quizów do identyfikatorów znaczników
+            const badgeMapping = {
+                'intro-quiz': 'intro-badge',
+                'basics-quiz': 'basics-badge',
+                'classification-quiz': 'classification-badge',
+                'remote-quiz': 'remote-badge',
+                'password-quiz': 'passwords-badge',
+                'incidents-quiz': 'incidents-badge',
+                'final-quiz': 'summary-badge'
+            };
+            
+            console.log('Aktualizacja znaczników zaliczenia w nawigacji');
+            console.log('Status quizów:', quizProgress);
+            
+            // Aktualizacja widoczności znaczników na podstawie postępu quizów
+            for (const [quizId, badgeId] of Object.entries(badgeMapping)) {
+                const badge = document.getElementById(badgeId);
+                if (badge) {
+                    // Sprawdź poprzedni stan wyświetlania
+                    const wasVisible = badge.style.display === 'inline-flex';
+                    
+                    // Zaktualizuj widoczność znacznika
+                    badge.style.display = quizProgress[quizId] ? 'inline-flex' : 'none';
+                    
+                    console.log(`Badge ${badgeId}: ${quizProgress[quizId] ? 'pokazany' : 'ukryty'}`);
+                    
+                    // Dodaj klasę "new" dla nowo ukończonych quizów
+                    if (!wasVisible && quizProgress[quizId]) {
+                        badge.classList.add('new');
+                        setTimeout(() => {
+                            badge.classList.remove('new');
+                        }, 1500); // Usuń klasę po zakończeniu animacji
+                    }
+                } else {
+                    console.warn(`Nie znaleziono znacznika o ID ${badgeId}`);
+                }
+            }
+        }
 </script>
 </body>
 </html>
